@@ -1,6 +1,5 @@
 import React from 'react'
 import Form from './Form'
-import Todo from './Todo'
 import axios from 'axios'
 
 
@@ -12,8 +11,17 @@ export default class App extends React.Component {
       this.state = {
         toDos: [],
         err: '',
+        toDoNameChange: '',
       }
   }
+  onToDoNameChange = evt => {
+    const { value } = evt.target
+    this.setState({
+      ...this.state.toDoNameChange,
+      toDoNameChange: value
+    })
+  }
+
   getToDos = () => {
     axios.get(URL) 
       .then(res => {
@@ -37,8 +45,14 @@ export default class App extends React.Component {
     return (
       <div>
         <span>Errors: {this.state.err}</span>
-        <Todo />
-        <Form />
+        {
+          this.state.toDos.map(td => {
+            return (
+              <div key={td.id}>{td.name}</div>
+            )
+          })
+        }
+        <Form onToDoNameChange={this.onToDoNameChange}/>
       </div>
     )
   }
