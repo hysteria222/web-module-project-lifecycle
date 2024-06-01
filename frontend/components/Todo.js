@@ -7,7 +7,9 @@ export default class Todo extends React.Component {
   render() {
     return (
       <>
-      <div onClick={this.props.toggleCompleted(this.props.td.id)} key={td.id}>{td.name}{td.completed? '✓' : ''}</div>
+      <div onClick={this.props.toggleCompleted(this.props.toDos.id)}>
+        {this.props.toDos.name}{this.props.toDos.completed ? ' ✓' : ''}
+      </div>
       </>
     )
   }
