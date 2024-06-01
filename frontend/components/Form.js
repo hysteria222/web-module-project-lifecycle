@@ -6,15 +6,21 @@ export default class Form extends React.Component {
    
   }
   render() {
-    const onToDoNameChange = this.props.onToDoNameChange
-    const onFormSubmit = this.props.onFormSubmit
-    
+   
     return (
-      <form id="todo" onSubmit={onFormSubmit}>
-        <input type="text" placeholder="Type Todo Here" onChange={onToDoNameChange}></input>
-        <input type="submit" ></input>
-        <button>Clear Completed</button>
+      <>
+      <form id="todo" onSubmit={this.props.onFormSubmit}>
+        <input 
+          type="text" 
+          placeholder="Type Todo Here" 
+          value={this.props.toDoNameChange} 
+          onChange={this.props.onToDoNameChange}
+          />
+
+        <input type="submit" />
       </form>
+      <button onClick={this.props.toggleDisplayCompleted}> {this.props.displayCompleted ? 'Hide' : 'Show'} Completed </button>
+      </>
     )
   }
 }

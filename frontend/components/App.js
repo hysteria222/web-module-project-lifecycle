@@ -1,6 +1,7 @@
 import React from 'react'
 import Form from './Form'
 import axios from 'axios'
+import TodoList from './TodoList'
 
 
 const URL = 'http://localhost:9000/api/todos'
@@ -12,11 +13,11 @@ export default class App extends React.Component {
         toDos: [],
         err: '',
         toDoNameChange: '',
+        displayCompleted: true
       }
   }
   
   onToDoNameChange = evt => {
-    evt.preventDefault()
     const { value } = evt.target
     this.setState({
       ...this.state,
@@ -24,16 +25,22 @@ export default class App extends React.Component {
     })
   }
 
+  resetForm = () => this.setState({toDoNameChange: ''})
+
   postNewToDo = () => {
     axios.post(URL, { name: this.state.toDoNameChange })
-      .then( res => {
-        this.getToDos()
-        this.setState({
-          ...this.state,
-          toDoNameChange: ''
-        })
+      .then(res => {
+        console.log(res)
+        this.setState({toDos: this.state.toDos.concat(res.data.data)})
+        this.resetForm()
       })
-      .catch(err => {console.log(err)})
+      .catch(this.setErr)
+  }
+
+  setErr = err => { 
+    this.setState({
+      err: err.response.data.message
+    })
   }
 
   onFormSubmit = evt => {
@@ -45,16 +52,28 @@ export default class App extends React.Component {
     axios.get(URL) 
       .then(res => {
         this.setState({
-          ...this.state, 
           toDos: res.data.data
         })
       })
-      .catch(err => {
-        this.setState({
-          ...this.state, 
-          err: err.response.data.message
+      .catch(this.setErr)
+  }
+
+  toggleCompleted = id => () => {
+    axios.patch(`${URL}/${id}`)
+      .then(res => {
+        this.setState({toDos: this.state.toDos.map(td => {
+          if(td.id !== id) {
+            return td
+          }
+          return res.data.data
+          })
         })
       })
+      .catch(this.setErr)
+  }
+
+  toggleDisplayCompleted = () => {
+    this.setState({displayCompleted: !this.state.displayCompleted })
   }
 
   componentDidMount() {
@@ -66,14 +85,8 @@ export default class App extends React.Component {
     return (
       <div>
         <span>Errors: {this.state.err}</span>
-        {
-          this.state.toDos.map(td => {
-            return (
-              <div key={td.id}>{td.name}</div>
-            )
-          })
-        }
-        <Form onToDoNameChange={this.onToDoNameChange} onFormSubmit={this.onFormSubmit}/>
+        <TodoList toDos={this.state.toDos} toggleCompleted={this.toggleCompleted}/>
+        <Form toDoNameChange={this.state.toDoNameChange} onToDoNameChange={this.onToDoNameChange} onFormSubmit={this.onFormSubmit} toggleDisplayCompleted={this.toggleDisplayCompleted} displayCompleted={this.state.displayCompleted}/>
       </div>
     )
   }
